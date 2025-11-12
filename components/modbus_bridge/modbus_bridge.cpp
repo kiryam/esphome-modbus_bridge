@@ -22,7 +22,7 @@
 #include "esphome/core/helpers.h"
 #include "esphome/core/application.h"
 #include "esphome/core/hal.h"
-#include "esphome/components/network/util.h"
+//#include "esphome/components/network/util.h"
 
 namespace esphome {
 namespace modbus_bridge {
