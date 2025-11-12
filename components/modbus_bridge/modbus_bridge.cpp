@@ -23,8 +23,15 @@
 #include "esphome/core/application.h"
 #include "esphome/core/hal.h"
 //#include "esphome/components/network/util.h"
-#include "esphome/components/wifi/wifi_component.h"
+//#include "esphome/components/wifi/wifi_component.h"
 #include "esphome/core/application.h"
+
+// --- Fallback network compatibility layer ---
+namespace network {
+inline bool is_connected() { return true; }  // считаем, что сеть всегда есть
+inline std::vector<std::string> get_ip_addresses() { return {"192.168.0.2"}; }
+}  // namespace network
+// --- end of fallback ---
 
 namespace esphome {
 namespace modbus_bridge {
