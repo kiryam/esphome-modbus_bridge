@@ -22,16 +22,7 @@
 #include "esphome/core/helpers.h"
 #include "esphome/core/application.h"
 #include "esphome/core/hal.h"
-//#include "esphome/components/network/util.h"
-//#include "esphome/components/wifi/wifi_component.h"
-#include "esphome/core/application.h"
-
-// --- Fallback network compatibility layer ---
-namespace network {
-inline bool is_connected() { return true; }  // считаем, что сеть всегда есть
-inline std::vector<std::string> get_ip_addresses() { return {"192.168.0.2"}; }
-}  // namespace network
-// --- end of fallback ---
+#include "esphome/components/network/util.h"
 
 namespace esphome {
 namespace modbus_bridge {
@@ -226,10 +217,10 @@ void ModbusBridgeComponent::setup() {
   }
 
     this->set_interval("tcp_server_and_network_check", 1000, [this]() {
-      if (this->sock_ < 0 && esphome::wifi::global_wifi_component->is_connected()) {
+      if (this->sock_ < 0 && network::is_connected()) {
         ESP_LOGI(TAG, "IP available – initializing TCP server");
         this->initialize_tcp_server_();
-      } else if (this->sock_ >= 0 && !esphome::wifi::global_wifi_component->is_connected()) {
+      } else if (this->sock_ >= 0 && !network::is_connected()) {
         ESP_LOGW(TAG, "Lost network IP – closing TCP server");
 #if defined(USE_ESP8266)
         this->server_.stop();
@@ -328,7 +319,7 @@ void ModbusBridgeComponent::initialize_tcp_server_() {
   this->clients_.assign(this->tcp_allowed_clients_, TCPClient{});
   for (auto &c : this->clients_) c.fd = -1;
 
-  auto ips = esphome::wifi::global_wifi_component->get_ip_addresses();
+  auto ips = network::get_ip_addresses();
   if (!ips.empty()) {
     ESP_LOGI(TAG, "TCP server started on %s:%d", ips[0].str().c_str(), this->tcp_port_);
   } else {
